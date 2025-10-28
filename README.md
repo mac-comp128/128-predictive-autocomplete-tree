@@ -1,8 +1,8 @@
 # Comp128 HW3: Auto-Complete
 
-Your final homework assignment is to implement a new type of tree data structure. This is a data structure that we have not discussed in class (although it is similar to other trees), so this assignment is meant to simulate the sorts of problems you might encounter as a developer: implementing a new data structure for a particular task. You should be well prepared for this based on your existing knowledge of trees and ADT implementations.
+Your third homework assignment is to implement a new type of tree data structure --- a Trie. This is a data structure that we have not discussed in class (although it is similar to other trees), so this assignment is meant to simulate the sorts of problems you might encounter as a developer: implementing a new data structure for a particular task. You should be well prepared for this based on your existing knowledge of trees and ADT implementations.
 
-The context for this assignment is a text auto-complete program. Auto-complete checkers, like the predictive ones on your phone that provide word suggestions once you start typing, need to store a spelling dictionary in a way that makes it as fast as possible to see what words start with a specific prefix. For example if you started typing the word "do", the auto-complete program should quickly be able to suggest longer words like "dog" or "doctor" that contain the prefix "do".
+The task in question for this assignment is a text auto-complete program. Auto-complete checkers, like the predictive ones on your phone that provide word suggestions once you start typing, need to store a spelling dictionary in a way that makes it as fast as possible to see what words start with a specific prefix. For example if you started typing the word "do", the auto-complete program should quickly be able to suggest longer words like "dog" or "doctor" that contain the prefix "do".
 
 To make this work efficiently with a tree, rather than storing each word as a node in the tree. We will break the words into individual characters. Each character will correspond to a node in the tree. If the node corresponds with the last letter in the word, then we will mark it using a boolean value that it is the end of a word. Let's look at an example for how each letter gets added, assuming we want to add the words "do", "don", "cat", and "car" to the tree:
 
@@ -27,7 +27,7 @@ It is very fast to check whether a word is in the tree: start from the root and 
 
 This tree can also efficiently support auto-completion. Given the prefix-based structure of the tree, it is straightforward to enumerate all of the words that begin with a given letter sequence: these will be represented by nodes that are descendants of the node corresponding to that prefix.
 
-There are multiple ways you might implement the structure shown in the images. We will use a simple implementation that uses a lot of space, but is fast. Each node of the tree has a boolean variable indicating whether a string ending there is a word (corresponding to whether the node is purple or orange in the diagrams). Each node also contains a Map representing outgoing links to child nodes. The map keys are individual letters, and the values are references to other tree nodes. Notice that this is not a binary tree. Each node might have up to 26 children.
+There are multiple ways you might implement the structure shown in the images. We will use a simple implementation that uses a lot of space, but is fast. Each node of the tree has a boolean variable indicating whether a string ending there is a word (corresponding to whether the node is purple or orange in the diagrams). Each node also contains a Map representing outgoing links to child nodes. The map keys are individual letters, and the values are references to other tree nodes. Notice that this is *not* a binary tree. Each node might have up to 26 children.
 
 ## Task
 
@@ -41,22 +41,22 @@ This should add the word to the tree by creating nodes for each character in the
 When the last character is reached, that node should be marked as the end of a word.
 If the word does not already exist in the tree, the size variable should be incremented. If the word already exists, this method should not change the tree structure or size variable. 
  
- The string `charAt` method may be helpful to get individual characters from the word.
- Once you complete this, the testAdd method in the `TestPrefixTree` file should pass.
+The string `charAt` method may be helpful to get individual characters from the word.
+Once you complete this, the testAdd method in the `TestPrefixTree` file should pass.
 
 ### contains(String word)
 
 This should return true if the word is contained in the tree. Starting at the root, you can iterate through the word's characters searching down the path of nodes. If each character is found in the correct order and the last is marked as a word, then the word is contained in the tree.
 
-Once you complete this, the testContains method should pass.
+Once you complete this, the `testContains` method should pass.
 
 ### getWordsForPrefix(String prefix)
 
 This should return a list of words contained in the tree that start with the prefix characters, including the prefix if it is a word itself. These words can be found by traversing through the letters of the prefix and then traversing any child decendents of the last prefix node.
 
-There are multiple ways to implement this, but probably the easiest is to write a separate helper, recursive method to preorder-traverse the child decendents. Look in the BST activity for an example of a recursive pre-order traversal; however, note that this tree is not binary.
+There are multiple ways to implement this, but probably the easiest is to write a separate helper, recursive method to preorder-traverse the child decendents. Look in the BST activity for an example of a recursive pre-order traversal. However, note that this tree is not binary!
 
-Once you complete this, the testPrefix method should pass.
+Once you complete this, the `testPrefix` method should pass.
 
 ## Play!
 Once your tree is working, run the `AutoComplete` class. Enter the text for a prefix and it will show you the results from a dictionary:
@@ -88,7 +88,9 @@ computed
 ```
 ## Submit
 
-When you are done, commit and push your code back to github.
+When you are done, commit and push your code back to Github.
+
+Please make sure to follow the guidelines for [good Java style](https://docs.google.com/document/d/1GT207Pia0q7bETKrqSi--C3X7N_67XgRXYEvQFrwHdI/edit?usp=sharing) you've seen in previous assignments. To verify correctness, passing the provided tests may be insufficient --- you should write additional tests to cover any edge cases that may not be covered by the starter code.
 
 ## Attribution
 
