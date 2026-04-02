@@ -172,5 +172,3 @@ We have seen 5 total words that begin with "c": 3 of them have been "cat" and 2 
 Similarly, we have seen 5 words with prefix "do": 4 of them have been completed as "do" and 1 as "don", so the probability of the prefix "do" being completed as "do" is 0.8 and "do" being completed as "don" is 0.2. 
 
 In general, we should estimate the completion probability by finding the `prefixCount` of the node that represents the prefix and the `wordCount` of the node representing the word (which should be a descendent of the prefix node). Then we divide the `wordCount` by the `prefixCount`. In other words, we ask out of all the times we've seen the prefix, what proportion of the time was it as part of the word of interest?
-
-## Attribution
