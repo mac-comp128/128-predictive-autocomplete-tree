@@ -154,8 +154,6 @@ Let's look at an example for how a series of calls to `add` should modify the st
 Note that adding "do" after "don" results in no new nodes being added! We simply modify the node representing "do" to mark that the prefix denotes a word!
 
 ### Example - Computing Completion Probabilities
-
-<<<<<<< HEAD
 Suppose we modify the above example to provide the number of times each word was seen. Suppose we make the following calls to our trie methods:
 
 ```
