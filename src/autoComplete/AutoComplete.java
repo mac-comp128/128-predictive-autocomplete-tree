@@ -3,7 +3,7 @@ package autoComplete;
 import java.io.*;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -19,8 +19,7 @@ public class AutoComplete {
         PrefixTree tree = new PrefixTree();
 
         File file = getFile("dictionary.txt"); // use smalldictionary.txt for testing if needed.
-        try {
-            BufferedReader r = new BufferedReader(new FileReader(file));
+        try (BufferedReader r = new BufferedReader(new FileReader(file))) {
             while (true) {
                 String word = r.readLine(); // one word per line
                 if (word == null) {
@@ -39,7 +38,7 @@ public class AutoComplete {
             if (text.trim().equalsIgnoreCase("stop")) {
                 break;
             }
-            ArrayList<String> words = tree.getWordsForPrefix(text);
+            List<String> words = tree.getWordsForPrefix(text);
             if (words.isEmpty()){
                 System.out.println("No words found with the prefix: "+ text);
             }

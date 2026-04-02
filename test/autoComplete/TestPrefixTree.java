@@ -4,9 +4,11 @@ import org.junit.jupiter.api.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Class to test the tree implementation
@@ -66,7 +68,7 @@ public class TestPrefixTree {
         tree.add("possible");
         tree.add("possum");
         tree.add("pot");
-        ArrayList<String> result = tree.getWordsForPrefix("pot");
+        List<String> result = tree.getWordsForPrefix("pot");
         assertEquals(3, result.size());
         assertTrue(result.contains("pot"));
         assertTrue(result.contains("pottery"));
@@ -77,5 +79,44 @@ public class TestPrefixTree {
         assertTrue(result.contains("muse"));
         assertTrue(result.contains("muscle"));
         assertTrue(result.contains("musk"));
+    }
+
+    @Test
+    public void testConditional() {
+        PrefixTree tree = new PrefixTree();
+
+        tree.add("the", 3);
+        tree.add("there", 2);
+        tree.add("thereafter");
+
+        tree.add("who", 5);
+        tree.add("whom", 2);
+        tree.add("whomever", 3);
+
+        assertEquals(1.0/3.0, tree.getCompletionProb("the", "there"));
+        assertEquals(1.0/6.0, tree.getCompletionProb("the", "thereafter"));
+        assertEquals(1.0/2.0, tree.getCompletionProb("the", "the"));
+        assertEquals(1.0/3.0, tree.getCompletionProb("there", "thereafter"));
+    }
+
+    @Test
+    public void testLikelyWords() {
+        PrefixTree tree = new PrefixTree();
+
+        tree.add("the", 3);
+        tree.add("there", 2);
+        tree.add("thereafter");
+
+        tree.add("who", 5);
+        tree.add("whom", 2);
+        tree.add("whomever", 3);
+
+        List<WordProb> output = tree.getLikelyWordsForPrefix("who");
+        List<WordProb> expected = new ArrayList<>();
+        expected.add(new WordProb("who", 1.0/2.0));
+        expected.add(new WordProb("whomever", 3.0/10.0));
+        expected.add(new WordProb("whom", 1.0/5.0));
+
+        assertIterableEquals(expected, output);
     }
 }

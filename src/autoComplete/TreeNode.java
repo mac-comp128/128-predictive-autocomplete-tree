@@ -16,11 +16,19 @@ public class TreeNode {
     // but this can make things easier.
     public char letter;
 
+    // Counts for the number of times this *word* (i.e., path ending at this node) was inserted.
+    public int wordCount;
+
+    // Counts for the number of times a word with this word as it's *prefix* was inserted.
+    public int prefixCount;
+
     // The node's children keyed by each child node's letter
     public Map<Character, TreeNode> children;
 
     public TreeNode(){
         children = new HashMap<>();
         isWord = false;
+        wordCount = 0;
+        prefixCount = 0;
     }
 }
