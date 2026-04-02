@@ -155,6 +155,7 @@ Note that adding "do" after "don" results in no new nodes being added! We simply
 
 ### Example - Computing Completion Probabilities
 
+<<<<<<< HEAD
 Suppose we modify the above example to provide the number of times each word was seen. Suppose we make the following calls to our trie methods:
 
 ```
