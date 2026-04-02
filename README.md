@@ -156,11 +156,12 @@ Let's look at an example for how each letter gets added, assuming we want to add
 ### Example - Computing Completion Probabilities
 
 Suppose we've seen the only the following words with the following counts:
-
-who | 5
-whom | 2
-whomever | 3
-
+| word | count |
+| - | - |
+| who | 5 |
+| whom | 2 |
+| whomever | 3 |
+ 
 Since all words begin with the prefix "who", we can conclude that we've seen 10 instances where the prefix "who" was seen. Of these, 5 were who, 2, were whom, and 3 were whomever. Thus, for this assignment, we should estimate that "who" will be completed as "who" 50% of the time, "whom" 20% of the time, and "whomever" 30% of the time. 
 
 Similarly, if the user enters the prefix "whom" (i.e., they type an additional "m"), we have seen only 5 instances where "whom" was a prefix. 40% (2 of 5) of them were completed as "whom," and 60% (3 of 5) of them were completed as "whomever."
