@@ -101,6 +101,7 @@ public class PrefixTree {
      * @return the estimated probability for prefix being completed to word
      */
     public double getCompletionProb(String prefix, String word) {
+        if (!word.startsWith(prefix)) return 0.0;
         // TODO
         return 0.0;
     }

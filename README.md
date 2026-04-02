@@ -6,7 +6,7 @@ The task in question for this assignment is a text auto-complete program. Auto-c
 
 To make this work efficiently with a tree, rather than storing each word as a node in the tree. We will break the words into individual characters. Each character will correspond to a node in the tree. If the node corresponds with the last letter in the word, then we will mark it using a boolean value that it is the end of a word. You can see an example of building a Trie in the "Example" section below, but a diagram of a fully instantiated Trie looks like this:
 
-<img src="/images/tree16.png" width=60%>
+<img src="/images/Trie.png" width=60%>
 
 It is very fast to check whether a word is in the tree: start from the root and trace out the word along the edges; if one ends up at a word-terminating node (a purple node in the images above), then the word is in the tree, otherwise it is not.
 
@@ -14,20 +14,26 @@ This tree can also efficiently support auto-completion. Given the prefix-based s
 
 There are multiple ways you might implement the structure shown in the images. We will use a simple implementation that uses a lot of space, but is fast. Each node of the tree has a boolean variable indicating whether a string ending there is a word (corresponding to whether the node is purple or orange in the diagrams). Each node also contains a Map representing outgoing links to child nodes. The map keys are individual letters, and the values are references to other tree nodes. Notice that this is *not* a binary tree. Each node might have up to 26 children.
 
-Another convenient feature of the Trie is that it makes implementing *predictive* auto-completion rather straightforward. If we store information about how often a word appears in text (and how often each *prefix* appears in text) at each node, it's straightforward to estimate the probability of each possible completion for each prefix. This allows you to build an autocomplete system like you'd see in Google Search, where likely completions are presented before less likely ones. 
+Another convenient feature of the Trie is that it makes implementing *predictive* auto-completion rather straightforward. If we store information about how often a word appears in text (and how often each *prefix* appears in text) at each node, it's straightforward to estimate the probability of each possible completion for each prefix. This allows you to build an autocomplete system like you'd see in Google Search, where likely completions are presented before less likely ones. You can see this with the modified trie structure below, where each node is annotated by two numbers --- how many times it appears as a word, and how many times it has appeared as a prefix respectively. 
+
+<img src="/images/TrieWithCounts.png" width=60%>
 
 ## Task
 
 Explore the starter code that we have given you. 
 
-We have included a `TreeNode` class to represent nodes in the tree. There is also a `PrefixTree` class where you will write your code, and an `AutoComplete` class to play with your completed tree. These suffice for completing Part 1 of the assignment, where you build a non-predictive autocomplete system.
+We have included a `TreeNode` class to represent nodes in the tree. There is also a `PrefixTree` class where you will write most of your code, and an `AutoComplete` class to play with your completed tree. These suffice for completing Part 1 of the assignment, where you build a non-predictive autocomplete system.
 
 We additionally provide a few classes to help as you implement the probabilistic features of `PrefixTree` in Part 2. These include `WordProb`, which simply stores a word paired with its probability, and `PredictiveAutoComplete`, which modifies `AutoComplete` to suggest likely words first. 
+
+Before getting started on the next two sections, you should also familiarize yourself with the mechanics of the Trie --- the two sections under the Example header below provide examples of how to build a non-predictive trie (as you will do in Part 1) and how your predictive trie should operate (the goal of part 2).
 
 
 ### Part 1: The Trie
 
-In the `PrefixTree` class, implement the tree structure defined above. Specifically, you should implement the following methods:
+In the `PrefixTree` class, implement the tree structure defined above without considering the frequency of various words you add. You should implement functionality that allows for new words to be added to the trie, and for words presence in the trie to be quickly computed.
+
+Specifically, you should implement the following methods:
 
 #### add(String word)
 
@@ -58,11 +64,11 @@ There are multiple ways to implement this, but probably the easiest is to write 
 
 Once you complete this, the `testPrefix` method should pass.
 
-### Part 2: Probabilities 
+### Part 2: Counts and Prediction
 
-For the second part of the assignment, you will update your trie to store the frequencies with which various words and prefixes appear. These will be stored using the `wordCount` and `prefixCount` instance variables in `TreeNode`. `wordCount` should track the number of times the word represented by this node has been seen, and `prefixCount` should track the number times a word has been seen that has the sequence represented by this node as a prefix (equivalently, the number of times a descendent word has been seen).
+For the second part of the assignment, you will update your trie to be able to store the frequency with which various words and prefixes appear. These will be stored using the `wordCount` and `prefixCount` instance variables in `TreeNode`. `wordCount` should track the number of times the word represented by this node has been seen (determined by the `count` parameter in calls to `add`), and `prefixCount` should track the number times a word has been seen that has the sequence represented by this node as a prefix (equivalently, the number of times a descendent word has been seen through calls to `add`).
 
-With these, we can relatively easily estimate the (conditional) probabilities of a word being the completion of a prefix! If we've seen the prefix "who" 10 times and the word "whomever" 3 times, we can naively estimate the probability of completing "who" as "whomever" as 3/10. We can then imagine ranking all possible completions by this probability so that we can list likely completions first (as `PredictiveAutoComplete` will do!).
+With these, we can relatively easily estimate the (conditional) probabilities of a word being the completion of a prefix! If we've seen the prefix "who" 10 times and the word "whomever" 3 times, we can naively estimate the probability of completing "who" as "whomever" as 3/10. We can then imagine ranking all possible completions by this probability so that we can list likely completions first (as `PredictiveAutoComplete` will do!). A more throrough example of intended behavior is below in the Examples section. 
 
 To complete part 2, you must complete the following methods:
 
@@ -72,7 +78,7 @@ We must now modify `add` to consider how often the word we added was seen. We ca
 
 Ths means that in addition to expanding the trie to include the provided word, we must update `prefixCount` and `wordCount` for every relevant node where that might change. For example, the trie must record that if we call `add("whom", 3)`, we have seen the prefixes "", "w", "wh", "who" and "whom" 3 more times, and that we've seen the full word "whom" 3 more times (remember every word has itself as a prefix!). 
 
-Be sure to avoid duplicating code!
+Be sure to avoid duplicating code between methods!
 
 #### getCount(String word)
 
@@ -82,7 +88,7 @@ This method should return the number of times we've seen this word.
 
 This method should determine the probability with which you estimate the prefix will be completed with the word. The provided code ensures that you return 0 when prefix is not actually a prefix of word.
 
-You should estimate this as (# of times we've seen word)/(# of times the prefix has appeared as a prefix). 
+You should estimate this as (# of times we've seen word)/(# of times the prefix has appeared as a prefix) -- see the Example section below!
 
 #### getLikelyWordsForPrefix(String prefix)
 
@@ -109,7 +115,7 @@ apply
 applying
 ```
 
-You may do the same once you complete Part 2 with `PredictiveAutoComplete`, noting that now we print and order by probability! Be warned that counts.txt is relatively large --- it's a truncated version of counts from the [Corpus of Contemporary American English](https://www.english-corpora.org/coca/). This contains ~470,000 words, compared to the ~80,000 in dictionary.txt. 
+You may do the same once you complete Part 2 with `PredictiveAutoComplete`, noting that now we print and order by probability! Be warned that counts.txt --- the source we use to build the tree --- is relatively large. It's a truncated version of counts from the [Corpus of Contemporary American English](https://www.english-corpora.org/coca/). This contains ~470,000 words, compared to the ~80,000 in dictionary.txt. 
 
 ```
 Enter text prefix to search, or 'stop'.
@@ -134,37 +140,38 @@ Please make sure to follow the guidelines for [good Java style](https://docs.goo
 
 ## Examples 
 ### Example - Building a Trie
-Let's look at an example for how each letter gets added, assuming we want to add the words "do", "don", "cat", and "car" to the tree:
+Each `add` should proceed downward from the root moving to a child that represents the next letter in the word. If that node doesn't exists, that node should be created. The last node along the path should be marked as a word.
 
-<img src="/images/tree1.png" width=60%>
-<img src="/images/tree2.png" width=60%>
-<img src="/images/tree3.png" width=60%>
-<img src="/images/tree4.png" width=60%>
-<img src="/images/tree5.png" width=60%>
-<img src="/images/tree6.png" width=60%>
-<img src="/images/tree7.png" width=60%>
-<img src="/images/tree8.png" width=60%>
-<img src="/images/tree9.png" width=60%>
-<img src="/images/tree10.png" width=60%>
-<img src="/images/tree11.png" width=60%>
-<img src="/images/tree12.png" width=60%>
-<img src="/images/tree13.png" width=60%>
-<img src="/images/tree14.png" width=60%>
-<img src="/images/tree15.png" width=60%>
-<img src="/images/tree16.png" width=60%>
+Let's look at an example for how a series of calls to `add` should modify the structure of the trie. Nodes that are filled in represent words (i.e., the `isWord` parameter), and nodes in red are nodes that are modified as part of each add. 
+
+<img src="/images/trie_1.jpg" width=60%>
+<img src="/images/trie_2.jpg" width=60%>
+<img src="/images/trie_3.jpg" width=60%>
+<img src="/images/trie_4.jpg" width=60%>
+<img src="/images/trie_5.jpg" width=60%>
+<img src="/images/trie_6.jpg" width=60%>
+
+Note that adding "do" after "don" results in no new nodes being added! We simply modify the node representing "do" to mark that the prefix denotes a word!
 
 ### Example - Computing Completion Probabilities
 
-Suppose we've seen the only the following words with the following counts:
+Suppose we modify the above example to provide the number of times each word was seen. Suppose we make the following calls to our trie methods:
 
-who | 5
-whom | 2
-whomever | 3
+```
+trie.add('cat", 3);
+trie.add('car", 2);
+trie.add('do", 4);
+trie.add('don", 1);
+```
 
-Since all words begin with the prefix "who", we can conclude that we've seen 10 instances where the prefix "who" was seen. Of these, 5 were who, 2, were whom, and 3 were whomever. Thus, for this assignment, we should estimate that "who" will be completed as "who" 50% of the time, "whom" 20% of the time, and "whomever" 30% of the time. 
+We should build the following trie, with node labels representing `wordCount` and `prefixCount` respectively. You are responsible for keeping track of these values with each call to `add` --- update `prefixCount` as you move downward from the root and update `wordCount` when you reach the node representing the word you added.
 
-Similarly, if the user enters the prefix "whom" (i.e., they type an additional "m"), we have seen only 5 instances where "whom" was a prefix. 40% (2 of 5) of them were completed as "whom," and 60% (3 of 5) of them were completed as "whomever."
+<img src="/images/TrieWithCounts.png" width=60%>
+
+We have seen 5 total words that begin with "c": 3 of them have been "cat" and 2 of them have been "car", so we should expect "c" to be completed with "cat" with probability 0.6 (3 of 5) and to be completed with "car" with probability 0.4 (2 of 5). 
+
+Similarly, we have seen 5 words with prefix "do": 4 of them have been completed as "do" and 1 as "don", so the probability of the prefix "do" being completed as "do" is 0.8 and "do" being completed as "don" is 0.2. 
+
+In general, we should estimate the completion probability by finding the `prefixCount` of the node that represents the prefix and the `wordCount` of the node representing the word (which should be a descendent of the prefix node). Then we divide the `wordCount` by the `prefixCount`. In other words, we ask out of all the times we've seen the prefix, what proportion of the time was it as part of the word of interest?
 
 ## Attribution
-
-Images for the tree are from Educative.io
